@@ -4,11 +4,20 @@
 
 初始化环境:
 
+centos:
+
 	yum install -y gcc  gcc-c++
 	yum install -y ImageMagick-devel
 	yum install libv4l-devel
 	yum install python-devel
 	ln -s  /usr/include/libv4l1-videodev.h  /usr/include/linux/videodev.h 
+	
+ubuntu:
+
+	sudo apt-get install imagemagick
+	sudo apt-get install python-gtk2-dev 
+	sudo apt-get install libv4l-dev
+	sudo ln -s /usr/include/libv4l1-videodev.h /usr/include/linux/videodev.h 
 
 下载并安装:
 
@@ -26,3 +35,52 @@
 
 	使环境变量生效
 	source /etc/profile
+	
+###  问题汇总
+
+Q:
+
+	fatal error: linux/videodev.h: No such file or directory
+	搜索问题，发现应该安装v4l(Video for Linux)的开发库。
+Debian系：
+
+	$ sudo apt-get install libv4l-dev
+RH系：
+
+	$ sudo yum install libv4l-devel
+Arch：
+
+	$ sudo pacman -S v4l-utils
+	
+	
+建立软链接
+
+	$ sudo ln -s /usr/include/libv4l1-videodev.h /usr/include/linux/videodev.h
+Edit: 我发现自己的/usr/include/linux/目录下有videodev2.h文件，于是先尝试给此文件建立软链接：
+
+	$ sudo ln -s /usr/include/linux/videodev2.h /usr/include/linux/videodev.h
+重新make，成功。
+
+
+Q:
+
+	ubuntu  make 
+	
+	/usr/include/x86_64-linux-gnu/bits/stdio2.h:140:1: error: expected identifier or ‘(’ before ‘{’ token
+	 {
+	 ^
+	 
+A:
+
+	export CFLAGS=""
+	./configure  --without-gtk --without-qt --without-imagemagick --without-python
+	sudo make
+	sudo make install
+
+
+### 参考文档
+
+[https://segmentfault.com/a/1190000004335339](https://segmentfault.com/a/1190000004335339)
+
+[https://bbs.archlinux.org/viewtopic.php?id=151274?db=5](https://bbs.archlinux.org/viewtopic.php?id=151274?db=5)
+
